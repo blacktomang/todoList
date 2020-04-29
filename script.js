@@ -6,10 +6,13 @@ const listsContainer = document.querySelector('[data-lists]'),
 	listTitleElement = document.querySelector('[data-list-title]'),
 	listCountElement = document.querySelector('[data-list-count]'),
 	tasksContainer = document.querySelector('[data-tasks]'),
-	taskTemplate = document.getElementById('task-template')
+	taskTemplate = document.getElementById('task-template'),
+	newTaskForm = document.querySelector('[data-task-creator]'),
+	newTaskInput = document.querySelector('[data-task-input]'),
+	deleteTaskButton = document.querySelector('[data-delete-task-button]')
 	;
 
-
+console.log(taskTemplate);
 const LOCAL_STORAGE_LIST_KEY = 'task.lists';
 const LOCAL_STORAGE_SELECTED_LIST_ID_KEY = 'task.selectedListId';
 let lists = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY))|| [];
@@ -20,6 +23,21 @@ listsContainer.addEventListener('click', e =>{
 		selectedListId = e.target.dataset.listId;
 		saveAndRender();
 	}
+})
+
+tasksContainer.addEventListener('click', e =>{
+	if (e.target.tagName.toLowerCase() === 'input') {
+		const selectedList = lists.find(list => list.id === selectedListId);
+		const selectedTask = selectedList.tasks.find( task=> task.id === e.target.id);
+		selectedTask.complete = e.target.checked;
+		save();
+		renderTaskCount(selectedList);
+	}
+})
+deleteTaskButton.addEventListener('click', e =>{
+	const selectedList = lists.find( list => list.id === selectedListId);
+	selectedList.tasks = selectedList.tasks.filter( task => !task.complete);
+	saveAndRender();
 })
 
 deleteListButton.addEventListener('click', e =>{
@@ -37,17 +55,36 @@ newListForm.addEventListener('submit', e =>{
 	lists.push(list);
 	saveAndRender();
 })
+
+//task
+
 function createList(name) {
 	return{
 		id:Date.now().toString(),
 		name:name,
-		tasks:[{
-			id:121212,
-			name:'test',
-			complete:true
-			}]
+		tasks:[]
 	}
 }
+
+newTaskForm.addEventListener('submit', e =>{
+	e.preventDefault();
+	const taskName = newTaskInput.value;
+	if (taskName === null || taskName === '') return;
+	const task = createTask(taskName);
+	newTaskInput.value = null;
+	const selectedList = lists.find(list => list.id === selectedListId);
+	selectedList.tasks.push(task)
+	saveAndRender();
+})
+
+function createTask(name) {
+	return{
+		id:Date.now().toString(),
+		name:name,
+		complete:false
+	}
+}
+
 function saveAndRender() {
 	save();
 	render();

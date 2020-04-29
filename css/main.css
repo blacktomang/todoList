@@ -84,6 +84,9 @@ form {
 .btn.delete:hover {
   color: var(--clr-warning);
 }
+/*form{
+  position: relative;
+}*/
 
 .new {
   background: transparent;
@@ -121,7 +124,7 @@ form {
   opacity: 0.15;
 }
 
-.new:focus:-ms-input-placeholder {
+.new:focus::-ms-input-placeholder {
   opacity: 0.15;
 }
 
